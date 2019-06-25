@@ -35,13 +35,15 @@ public class JdbcTemplateApplication {
 
           */
 
-        logger.info("TODO 10: [{}]", bookRepository.getBook(1));
+        logger.info("TODO 10: [{}]", bookRepository.getBookNameById(1));
 
         /*
 
             TODO 13 wywołanie metody dao, zwracającej obiekt Book
                 wywołaj metodę getBookById i wypisz zwracaną wartość do konsoli
          */
+
+        logger.info("TODO 13: [{}]", bookRepository.getBookWithId(1));
 
         /*
 

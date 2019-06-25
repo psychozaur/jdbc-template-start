@@ -2,13 +2,11 @@ package workshop.spring5.persistence.jdbctemplate.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import workshop.spring5.persistence.jdbctemplate.model.Book;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 
 // TODO 2 - zamień klasę w springowy komponent - nazwij go bookRepository
 
@@ -74,7 +72,7 @@ public class BookRepositoryImpl implements BookRepository {
 
     public String getBookNameById(long id){
 
-        Book book = jdbcTemplate.queryForObject("SELECT * FROM book WHERE book_id = ?", new Object[]{id}, Book.class);
+        Book book = jdbcTemplate.queryForObject("SELECT * FROM book WHERE book_id = ?", Book.class, id);
 
         return book.getTitle();
     }
@@ -84,6 +82,13 @@ public class BookRepositoryImpl implements BookRepository {
             Utwórz metodę getBookWithId zwracającą Book na podstawie przekazanego id
 
         */
+
+    public Book getBookWithId(long id){
+
+        Book book = jdbcTemplate.queryForObject("SELECT * FROM book WHERE book_id = ?", new BookRowMapper());
+
+        return book;
+    }
 
     /*
         TODO 14 - metoda dla COUNT
@@ -109,5 +114,18 @@ public class BookRepositoryImpl implements BookRepository {
             statyczna klasa implementująca RowMapper, mapująca ResultSet na Book
 
         */
+    public static class BookRowMapper implements RowMapper<Book>{
+
+        @Override
+        public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Book book = new Book();
+            book.setId(rs.getInt(""));
+            book.setTitle(rs.getString(2));
+            book.setIsbn(rs.getString(3));
+            book.setAuthor(rs.getString(4));
+            return book;
+        }
+    }
+
 
 }
