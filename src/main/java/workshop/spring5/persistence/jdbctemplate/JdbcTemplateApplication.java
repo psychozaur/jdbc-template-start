@@ -43,13 +43,15 @@ public class JdbcTemplateApplication {
                 wywołaj metodę getBookById i wypisz zwracaną wartość do konsoli
          */
 
-        logger.info("TODO 13: [{}]", bookRepository.getBookWithId(1));
+        logger.info("TODO 13: [{}]", bookRepository.getBookWithId(2));
 
         /*
 
             TODO 15 wywołanie metody dao, zwracającej ilość rekordów w tabeli
                 Wywołaj metodę getSize i wypisz zwracaną wartość do konsoli
          */
+
+        logger.info("TODO 15: records count: [{}]", bookRepository.getSize());
 
         /*
 
@@ -59,6 +61,10 @@ public class JdbcTemplateApplication {
                 Wywołaj metodę dao insertBook.
                 Wywołaj metodę getSize i wypisz zwracaną wartość do konsoli
          */
+
+        Book newBook = new Book((bookRepository.getSize()+1),"theBibel","theHollyCross","JeesusHimself");
+        bookRepository.insertBook(newBook);
+        logger.info("TODO 17: records count: [{}]", bookRepository.getSize());
 
         /*
 

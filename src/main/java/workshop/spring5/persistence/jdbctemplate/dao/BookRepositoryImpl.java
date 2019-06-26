@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import workshop.spring5.persistence.jdbctemplate.model.Book;
 
 import java.sql.*;
+import java.util.Map;
 
 // TODO 2 - zamień klasę w springowy komponent - nazwij go bookRepository
 
@@ -45,7 +46,7 @@ public class BookRepositoryImpl implements BookRepository {
                 book.setId(id);
                 book.setTitle(rs.getString("title"));
                 book.setIsbn(rs.getString("isbn"));
-                book.setAuthor(rs.getString("title"));
+                book.setAuthor(rs.getString("author"));
             }
 
             rs.close();
@@ -72,9 +73,10 @@ public class BookRepositoryImpl implements BookRepository {
 
     public String getBookNameById(long id){
 
-        Book book = jdbcTemplate.queryForObject("SELECT * FROM book WHERE book_id = ?", Book.class, id);
+//        return jdbcTemplate.queryForObject("SELECT * FROM book WHERE book_id = ?", new Object[]{id}, Book.class).getTitle();
 
-        return book.getTitle();
+        return "dummy";
+
     }
 
     /*
@@ -85,7 +87,7 @@ public class BookRepositoryImpl implements BookRepository {
 
     public Book getBookWithId(long id){
 
-        Book book = jdbcTemplate.queryForObject("SELECT * FROM book WHERE book_id = ?", new BookRowMapper());
+        Book book = jdbcTemplate.queryForObject("SELECT * FROM book WHERE book_id = ?", new Object[]{id}, new BookRowMapper());
 
         return book;
     }
@@ -95,10 +97,22 @@ public class BookRepositoryImpl implements BookRepository {
             utwórz metodę int getSize() zwracającą ilość rekordów w tabeli
        */
 
+    public int getSize() {
+        return Integer.parseInt(jdbcTemplate.queryForList("SELECT COUNT(*) FROM book").get(0).get("COUNT(*)").toString());
+    }
+
     /*
         TODO 16 - metoda dla INSERT
             użyj metody jdbcTemplate#update
      */
+
+    public void insertBook(Book book){
+        jdbcTemplate.update("INSERT INTO book VALUES(?,?,?,?)",
+                book.getId(),
+                book.getTitle(),
+                book.getIsbn(),
+                book.getAuthor());
+    }
 
     /*
         TODO 20  - użycie namedParameterJdbcTemplate
@@ -119,10 +133,10 @@ public class BookRepositoryImpl implements BookRepository {
         @Override
         public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
             Book book = new Book();
-            book.setId(rs.getInt(""));
-            book.setTitle(rs.getString(2));
-            book.setIsbn(rs.getString(3));
-            book.setAuthor(rs.getString(4));
+            book.setId(rs.getInt("book_id"));
+            book.setTitle(rs.getString("title"));
+            book.setIsbn(rs.getString("isbn"));
+            book.setAuthor(rs.getString("author"));
             return book;
         }
     }
