@@ -3,6 +3,9 @@ package workshop.spring5.persistence.jdbctemplate.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 import workshop.spring5.persistence.jdbctemplate.model.Book;
 
@@ -22,6 +25,13 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     // TODO 19 wstrzyknij namedParameterJdbcTemplate
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    @Autowired
+    public void setNamedParameterJdbcTemplate(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    }
+
 
     /*
             TODO 5 dzięki Spring JdbcTemplate znacznie uprościmy kod w metodach dao
@@ -73,9 +83,8 @@ public class BookRepositoryImpl implements BookRepository {
 
     public String getBookNameById(long id){
 
-//        return jdbcTemplate.queryForObject("SELECT * FROM book WHERE book_id = ?", new Object[]{id}, Book.class).getTitle();
+        return jdbcTemplate.queryForObject("SELECT title FROM book WHERE book_id = ?", new Object[]{id}, String.class);
 
-        return "dummy";
 
     }
 
@@ -98,7 +107,10 @@ public class BookRepositoryImpl implements BookRepository {
        */
 
     public int getSize() {
-        return Integer.parseInt(jdbcTemplate.queryForList("SELECT COUNT(*) FROM book").get(0).get("COUNT(*)").toString());
+//        return Integer.parseInt(jdbcTemplate.queryForList("SELECT COUNT(*) FROM book").get(0).get("COUNT(*)").toString());
+
+        String sql = "SELECT COUNT(*) FROM book";
+        return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
     /*
@@ -107,11 +119,14 @@ public class BookRepositoryImpl implements BookRepository {
      */
 
     public void insertBook(Book book){
-        jdbcTemplate.update("INSERT INTO book VALUES(?,?,?,?)",
-                book.getId(),
-                book.getTitle(),
-                book.getIsbn(),
-                book.getAuthor());
+//        jdbcTemplate.update("INSERT INTO book VALUES(?,?,?,?)",
+//                book.getId(),
+//                book.getTitle(),
+//                book.getIsbn(),
+//                book.getAuthor());
+
+        String sql = "INSERT INTO book (author, isbn, title, book_id) VALUES (?,?,?,?)";
+        jdbcTemplate.update(sql, new Object[]{book.getAuthor(), book.getIsbn(), book.getTitle(), book.getId()});
     }
 
     /*
@@ -123,12 +138,22 @@ public class BookRepositoryImpl implements BookRepository {
         Wywołaj na namedParameterJdbcTemplate metodę queryForObject - przekaż sql, param source i mappera.
      */
 
+    public Book getByTitleAndAuthor(String title, String author){
+        String sql = "SELECT * FROM book WHERE title = :title AND author = :author";
+
+        SqlParameterSource mapSqlParameterSource = new MapSqlParameterSource()
+                .addValue("title", title)
+                .addValue("author", author);
+
+        return namedParameterJdbcTemplate.queryForObject(sql,mapSqlParameterSource,new BookRowMapper());
+    }
+
     /*
         TODO 11 implementacja RowMapper'a
             statyczna klasa implementująca RowMapper, mapująca ResultSet na Book
 
         */
-    public static class BookRowMapper implements RowMapper<Book>{
+    private static final class BookRowMapper implements RowMapper<Book>{
 
         @Override
         public Book mapRow(ResultSet rs, int rowNum) throws SQLException {

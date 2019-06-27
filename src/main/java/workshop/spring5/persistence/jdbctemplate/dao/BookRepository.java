@@ -10,6 +10,6 @@ public interface BookRepository {
     public Book getBookWithId(long id);
     public int getSize();
     public void insertBook(Book book);
-
+    public Book getByTitleAndAuthor(String title, String author);
 
     }

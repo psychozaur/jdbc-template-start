@@ -71,6 +71,10 @@ public class JdbcTemplateApplication {
             TODO 21 wywołanie metody dao, wyszukującej rekord po tytule i autorze
                 Wywołaj metodę getByTitleAndAuthor i wypisz zwracaną wartość do konsoli
          */
+
+        String title = "anotherTitle";
+        String author = "anotherAuthor";
+        logger.info("TODO 21: getByTitleAndAuthor({},{}): [{}]", title, author, bookRepository.getByTitleAndAuthor(title,author));
     }
 
 }
